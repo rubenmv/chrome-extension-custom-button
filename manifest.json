@@ -3,30 +3,17 @@
 
     "name": "Youtube Download",
     "description": "Youtube Download with Savefrom site.",
-    "version": "0.1",
+    "version": "0.2",
 
-    "permissions": [
-  "notifications",
-  "tabs"
- ],
-    /*
-	// Browser actions pone el icono en la address bar
-	"browser_action": {
-		"default_icon": {
-			"128": "icon-128.png",
-			"48": "icon-48.png",
-			"24": "icon-24.png"
-		}
-	},
-	*/
-    // Page actions pone el icono dentro de la barra
-    "page_action": {
+    "permissions": ["notifications"],
+    // Browser actions pone el icono en la address bar
+    // Los iconos de las actions son 19px y 38px, pero se redimensiona bien
+    "browser_action": {
         "default_icon": {
-            "19": "icons/icon-24.png",
-            "38": "icons/icon-48.png"
+            "38": "icons/icon-48.png",
+            "19": "icons/icon-24.png"
         }
     },
-
     "icons": {
         "128": "icons/icon-128.png",
         "48": "icons/icon-48.png",
