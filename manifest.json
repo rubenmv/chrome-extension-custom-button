@@ -1,0 +1,38 @@
+{
+    "manifest_version": 2,
+
+    "name": "Youtube Download",
+    "description": "Youtube Download with Savefrom site.",
+    "version": "0.1",
+
+    "permissions": [
+  "notifications",
+  "tabs"
+ ],
+    /*
+	// Browser actions pone el icono en la address bar
+	"browser_action": {
+		"default_icon": {
+			"128": "icon-128.png",
+			"48": "icon-48.png",
+			"24": "icon-24.png"
+		}
+	},
+	*/
+    // Page actions pone el icono dentro de la barra
+    "page_action": {
+        "default_icon": {
+            "19": "icons/icon-24.png",
+            "38": "icons/icon-48.png"
+        }
+    },
+
+    "icons": {
+        "128": "icons/icon-128.png",
+        "48": "icons/icon-48.png",
+        "24": "icons/icon-24.png"
+    },
+    "background": {
+        "scripts": ["background.js"]
+    }
+}
