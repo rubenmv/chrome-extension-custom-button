@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <title>Custom Button</title>
-    <link rel="stylesheet" href="style-options.css" />
+    <link rel="stylesheet" href="options.css" />
 </head>
 
 <body>
+    <img src="icons/default-128.png" alt="default icon" />
     <h1>Custom Button options</h1>
 
     <h2>General</h2>
@@ -24,14 +25,23 @@
     <br />
 
     <h2>Advanced</h2>
+    <!--Domain pattern-->
     <label for="domain">Domain</label>
     <input type="text" id="domain" />
     <span>Indicates in regular expresion specific domain where the button should work<br/>By default it matches any url</span>
     <button id="domainRestore">Restore default</button>
     <br />
-
+    <!--Notifications-->
     <label for="notification">Notifications</label>
     <input type="checkbox" id="notification" />
+    <!--Notification options-->
+    <div id="notificationOptions">
+        <label for="notificationTitle">Title</label>
+        <input type="text" id="notificationTitle" />
+        <label for="notificationText">Text</label>
+        <input type="text" id="notificationText" />
+    </div>
+
     <span>Shows desktop notification when domain doesn't match</span>
     <br />
 

@@ -1,9 +1,15 @@
 /* GLOBALS */
 var customUrlGlobal,
     domainGlobal,
-    notificationGlobal;
+    notificationGlobal = {
+        'show': false,
+        'title': 'Custom Button',
+        'text': 'URL doesn\'t match'
+    };
 
 function initOptions() {
+    "use strict";
+
     function dataRetrieved(items) {
         // Check for error
         if (chrome.runtime.lastError !== undefined) {
@@ -13,7 +19,9 @@ function initOptions() {
         // Initialize
         customUrlGlobal = items.customUrl;
         domainGlobal = items.domain;
-        notificationGlobal = items.notification;
+        notificationGlobal.show = items.notification.show;
+        notificationGlobal.title = items.notification.title;
+        notificationGlobal.text = items.notification.text;
     }
 
     // Get the items from storage (asynchronous)
@@ -21,7 +29,11 @@ function initOptions() {
         // Sets some default values before retrieving data
         customUrl: '',
         domain: ".*",
-        notification: false
+        notification: {
+            'show': false,
+            'title': 'Custom Button',
+            'text': 'URL doesn\'t match'
+        }
     }, dataRetrieved);
 }
 
@@ -38,11 +50,11 @@ chrome.browserAction.onClicked.addListener(function (tabId) {
     if (tabUrl !== undefined && domainRegExp.test(tabUrl)) {
         // Replace %url with tab url
         window.open(customUrlGlobal.replace('%url', tabUrl));
-    } else if (notificationGlobal === true) {
+    } else if (notificationGlobal.show === true) {
         var options = {
             type: "basic",
-            title: "Custom Button",
-            message: "URL not valid",
+            title: notificationGlobal.title,
+            message: notificationGlobal.text,
             iconUrl: "icons/icon-128.png"
         };
         // No video alert
@@ -62,7 +74,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
             if (key === 'customUrl') {
                 customUrlGlobal = storageChange.newValue;
             } else if (key === 'notification') {
-                notificationGlobal = storageChange.newValue;
+                notificationGlobal.show = storageChange.newValue.show;
+                notificationGlobal.title = storageChange.newValue.title;
+                notificationGlobal.text = storageChange.newValue.text;
             } else if (key === 'domain') {
                 domainGlobal = storageChange.newValue;
             }
