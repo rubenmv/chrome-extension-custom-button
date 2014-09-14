@@ -1,32 +1,44 @@
 <!DOCTYPE html>
-<!-- Extension for Chrome Browser - Magic Actions for YouTube™ - CHROMEACTIONS.COM - Copyright 2014 Vlad and Serge Strukoff - All Rights Reserved -->
 <html>
 
 <head>
     <meta charset="UTF-8" />
-    <title>Magic Actions for YouTube</title>
-    <style type="text/css">
-        @font-face{font-family:'Open Sans';font-style:normal;font-weight:400;src:local('Open Sans'),local('OpenSans'),url('i/OpenSans.woff') format('woff')}body{padding-top:50px;font:1em/1.5em 'Open Sans','Segoe UI',Frutiger,Tahoma,Helvetica,'Helvetica Neue',Arial,sans-serif;color:#555;background:#f0f0f0;text-align:center;text-shadow:0 1px #fff}h1,h2{line-height:1.2em;font-weight:normal}a{display:inline-block;width:150px;padding:30px 0;text-decoration:none;color:#444;border-radius:10px;opacity:.7}a:hover{background-color:#f7f7f7;opacity:1}img{width:64px;height:64px}b{display:block}
-    </style>
-    <script type="text/javascript" src="options6791.js"></script>
+    <title>Custom Button</title>
+    <link rel="stylesheet" href="style-options.css" />
 </head>
 
 <body>
-    <h1>Thank You for using Magic Actions for YouTube&trade;</h1>
-    <h2>Software Made to Make Your Life Better!</h2>
-    <a href="http://www.chromeactions.com/">
-        <img src="i/home64.png" /><b>Home</b>
-    </a>
-    <a href="http://www.chromeactions.com/magic-actions-for-youtube-support.html">
-        <img src="i/contact64.png" /><b>Support</b>
-    </a>
-    <a href="https://chrome.google.com/webstore/detail/abjcfabbhafbcdfjoecdgepllmpfceif/reviews" target="_blank">
-        <img src="i/rate64.png" /><b>Rate</b>
-    </a>
-    <a id="opt" href="http://www.chromeactions.com/magic-actions-for-youtube-chrome-app.html">
-        <img src="i/opt64.png" /><b>Options</b>
-    </a>
-    <br/>
+    <h1>Custom Button options</h1>
+
+    <h2>General</h2>
+    <!--Command code-->
+    <label for="command">URL</label>
+    <input type="text" id="command" />
+    <span>Set the url you want to launch. Use %url to include the active tab url.<br/>Example: http://en.savefrom.net/%url</span>
+    <br />
+    <!--Icon-->
+    <label for="icon">Icon</label>
+    <input type="file" id="icon" />
+    <br />
+    <span>Change the icon</span>
+    <br />
+
+    <h2>Advanced</h2>
+    <label for="domain">Domain</label>
+    <input type="text" id="domain" />
+    <span>Indicates in regular expresion specific domain where the button should work<br/>By default it matches any url</span>
+    <button id="domainRestore">Restore default</button>
+    <br />
+
+    <label for="notification">Notifications</label>
+    <input type="checkbox" id="notification" />
+    <span>Shows desktop notification when domain doesn't match</span>
+    <br />
+
+    <button id="save">Save</button>
+    <span id="status"></span>
+
+    <script src="options.js"></script>
 </body>
 
 </html>

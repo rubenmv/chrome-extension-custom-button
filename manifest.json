@@ -1,11 +1,13 @@
 {
     "manifest_version": 2,
 
-    "name": "Youtube Download",
-    "description": "Youtube Download with Savefrom site.",
-    "version": "0.2",
+    "name": "Custom Button",
+    "description": "Customize a button.",
+    "version": "0.1",
 
-    "permissions": ["notifications"],
+    "permissions": ["notifications", "storage"],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+
     // Browser actions pone el icono en la address bar
     // Los iconos de las actions son 19px y 38px, pero se redimensiona bien
     "browser_action": {
