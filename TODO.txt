@@ -1,4 +1,5 @@
 - Permitir poner un icono propio, creo que hay que usar un worker para subir el icono a la
 carpeta de la extension.
-
-- Pasar variables a globales para no tener que leer el storage en cada click.
+- Pasar variables a globales para no tener que leer el storage en cada click
+- Pasar las options de la notificacion a globales
+- Añadir opciones para personalizar la notificacion

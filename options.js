@@ -2,12 +2,12 @@
 function saveOptions() {
     "use strict";
 
-    var commandText = document.getElementById('command').value,
+    var customUrl = document.getElementById('customUrl').value,
         domainRegex = document.getElementById('domain').value,
         notificationValue = document.getElementById('notification').checked;
 
     chrome.storage.sync.set({
-        'command': commandText,
+        'customUrl': customUrl,
         'domain': domainRegex,
         'notification': notificationValue
     }, function () {
@@ -24,11 +24,11 @@ function restoreOptions() {
     "use strict";
     // Set defaults
     chrome.storage.sync.get({
-        command: '',
+        customUrl: '',
         domain: ".*", // Use default domain regex to match anything on http/s
         notification: false
     }, function (items) {
-        document.getElementById('command').value = items.command;
+        document.getElementById('customUrl').value = items.customUrl;
         document.getElementById('domain').value = items.domain;
         document.getElementById('notification').checked = items.notification;
     });
