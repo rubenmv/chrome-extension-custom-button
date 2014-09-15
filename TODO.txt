@@ -3,3 +3,4 @@
 - Agregar sincronización para las opciones
 - Escoger otro nombre más decente
 - Agregar ejemplos de uso en la ayuda
+- Agregar informacion legal en la página de opciones y enlace a github
