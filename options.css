@@ -6,36 +6,45 @@
     vertical-align: top;
 }
 body {
-    margin: 12px 0 0 155px;
+    background: #ddd url(bg.png) repeat;
+}
+#wrapper {
+    margin: 30px 0 0 155px;
     min-width: 576px;
     max-width: 920px;
 }
-article + article {
-    margin: 36px 0 0 0;
+h1,
+h2 {
+    text-transform: uppercase;
 }
 h1 {
     font-size: 20pt;
-    margin: 1em 0;
+    margin: 0;
 }
 h2 {
     color: #666;
     font-size: 1.2em;
-    padding: 0.8em 0;
-    border-top: 1px solid #cfcfcf;
+    margin-top: 1em;
+    border-bottom: 1px solid #cfcfcf;
 }
 section {
-    background-color: #eef7fc;
     margin: 0.5em 0;
+    margin-bottom: 1em;
     padding: 0.5em;
-    border-radius: 5%;
+    border-radius: 10px;
+    border: 1px dashed #aaa;
 }
 label,
 input,
 button {
     vertical-align: middle;
 }
-input {
+input[type="text"] {
     padding: 0 0.5em;
+    min-width: 300px;
+}
+p {
+    margin: 0;
 }
 #notificationOptions {
     display: none;
@@ -43,15 +52,26 @@ input {
 #status {
     color: #cc0101;
 }
+#windowMode {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 2em;
+}
+#iconImage {
+    vertical-align: middle;
+    margin: 0 1em;
+    padding: 1em;
+    border: 3px solid #ccc;
+}
 .controls {
     display: inline-block;
     vertical-align: middle;
-    width: 50%;
+    width: 60%;
 }
 .help {
     display: inline-block;
     vertical-align: middle;
-    width: 48%;
+    width: 30%;
     border-left: 1px solid #CCC;
     padding-left: 10px;
 }

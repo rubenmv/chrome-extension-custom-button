@@ -2,3 +2,4 @@
 - Reorganizar como se crean las opciones por defecto, mirar otras extensiones
 - Agregar sincronización para las opciones
 - Escoger otro nombre más decente
+- Agregar ejemplos de uso en la ayuda
