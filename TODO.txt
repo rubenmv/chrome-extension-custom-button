@@ -1,5 +1,2 @@
-- Permitir poner un icono propio, creo que hay que usar un worker para subir el icono a la
-carpeta de la extension
-
 - Agregar licencia con referencia al autor del icono
 https://www.iconfinder.com/icons/274899/adjustments_change_configuration_control_option_options_preferences_settings_technology_tools_icon
