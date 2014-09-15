@@ -1,37 +1,57 @@
 * {
-    font-family: Ubuntu, Segoe, 'Lucida Grande', sans-serif;
+    font-family: Arial, Segoe, 'Lucida Grande', sans-serif;
     font-size: 10pt;
+    line-height: 1.5em;
     color: #303942;
+    vertical-align: top;
 }
-html {
+body {
     margin: 12px 0 0 155px;
     min-width: 576px;
-    max-width: 738px;
+    max-width: 920px;
 }
 article + article {
     margin: 36px 0 0 0;
 }
-code {
-    font: 10pt monospace;
-    background: #efefef;
-    border-radius: 3px;
-    padding: 2px 4px;
-}
 h1 {
     font-size: 20pt;
     margin: 1em 0;
-    border-bottom: 1px solid #efefef;
 }
 h2 {
     color: #666;
     font-size: 1.2em;
+    padding: 0.8em 0;
+    border-top: 1px solid #cfcfcf;
 }
 section {
-    margin-left: 18px;
+    background-color: #eef7fc;
+    margin: 0.5em 0;
+    padding: 0.5em;
+    border-radius: 5%;
 }
-label {
-    margin: 6px 0;
+label,
+input,
+button {
+    vertical-align: middle;
+}
+input {
+    padding: 0 0.5em;
 }
 #notificationOptions {
     display: none;
+}
+#status {
+    color: #cc0101;
+}
+.controls {
+    display: inline-block;
+    vertical-align: middle;
+    width: 50%;
+}
+.help {
+    display: inline-block;
+    vertical-align: middle;
+    width: 48%;
+    border-left: 1px solid #CCC;
+    padding-left: 10px;
 }

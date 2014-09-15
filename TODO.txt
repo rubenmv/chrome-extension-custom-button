@@ -1,2 +1,4 @@
-- Agregar licencia con referencia al autor del icono
-https://www.iconfinder.com/icons/274899/adjustments_change_configuration_control_option_options_preferences_settings_technology_tools_icon
+- Cambiar el icono por defecto por otro más decente https://www.iconfinder.com/popcic
+- Reorganizar como se crean las opciones por defecto, mirar otras extensiones
+- Agregar sincronización para las opciones
+- Escoger otro nombre más decente
