@@ -1,2 +1,0 @@
-Youtube Download:
-javascript:(function(){window.open('http://savefrom.net/?url='+encodeURIComponent(location.href));})()

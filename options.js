@@ -1,137 +1,183 @@
-var handleFileSelect = function (evt) {
-    "use strict";
-    var files = evt.target.files,
-        file = files[0];
-
-    if (files && file) {
-        var reader = new FileReader();
-
-        reader.onload = function (readerEvt) {
-            var binaryString = readerEvt.target.result;
-            document.getElementById('iconImage')
-                .setAttribute('src', 'data:image/png;base64,' + window.btoa(binaryString));
-        };
-        reader.readAsBinaryString(file);
-    }
+var FILE_SIZE_LIMIT = 50, //KB
+	IMAGE_DIM_LIMIT = 128, //px, square
+	ICON_MAX_KEYS = 13,//(50KB/4KB) per part = 12.5 parts
+	defaultIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAk6QAAJOkBUCTn+AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKhSURBVHic7ZqxaxRBFMZ/3yFYJNcFEfughYKKFjaKhUj+AxsVjGKXRlJb2kmwUZM0apO0NmKpSIooRrEwVnYhsZSkSJF7FrnFi9nbzOzu3VvMfPBg2bmd973fDTO7zMjMOMxqeRvwVgLgbcBbCYC3AW8lAN4GvFUJgKQJSTOSPkjalGQDiGVJtySprqL3yMyiAxgDFgEbYjwFVMZvYS0lih8HNoZcfBbP6oYQW3wLWHIqfiAQYgFMOxefxfO6ICjmY0jSKnAyp+kbMA/8Cu6sWFPApQN+Mwfct6pfcxH/fhvYYf+/8ar2iQkWevr/npMzi1kqjoSYZfAc+cvmk3jsUboKrPZpuwfMVlkiYwCcyLtpZh/LJg+Rma1TDOEuMFcWQlPfBLeyC0kjARAmKQmhqQC+9lyfh6CRMAnMx0JoKoCVnuuHWVEBEO4Aj6IyRczMN8iZieteAezvC9f7njwvgXZP+3H6rw6/gdFBrAJDk5l1gNvAZvfWTWBN0jtJC8AMsN7n8TZwLTTXkSpGBykz+ynpCvACOA2MApcDHz8amqeRIyCTmX0GLgAPgNfAWuijoTkaOwIymdk28Lgb+yQpr9jglaDRI2AYSgC8DXgrAfA24K0EwNuAtxIAbwPeSgC8DXgrAfA24K0EwNuAtxIAbwPeSgC8DXgrAfA24K0EwNuAt2IA5G5KSLpYk5doFeQO3UCJArACdHLuT0X0UbfycnfYu7tcqKYekjpIx9g9GXImp+2HmZ0K7ily27opx+SKYjqqphL79t4HJYtiCWgNDEAXgudR2aLYAMaj6yl5gsPjsHRRLAJjZWqJmgT/laQJ4Dq7e/hngZHSncVpC/gCfALemtmbsh1VAvA/KL0JehvwVgLgbcBbCYC3AW8degB/AF61RcU6E47HAAAAAElFTkSuQmCCa108ecd08c36a0062fb1687f7122400d';
+//Read icon file
+//Limits: 100KB and/or 128x128px
+var handleFileSelect = function(evt) {
+	"use strict";
+	var files = evt.target.files,
+		file = files[0];
+	if (files && file) {
+		var reader = new FileReader();
+		reader.onload = function(readerEvt) {
+			var binaryString = readerEvt.target.result;
+			var base64String = 'data:image/png;base64,' + window.btoa(binaryString);
+			document.getElementById('iconImage').setAttribute('src', base64String);
+		};
+		reader.readAsBinaryString(file);
+	}
 };
-
-if (window.File && window.FileReader && window.FileList && window.Blob) {
-    document.getElementById('iconFilePicker').addEventListener('change', handleFileSelect, false);
-} else {
-    console.log('The File APIs are not fully supported in this browser.');
+//Options validation
+function validateOptions() {
+	var customUrl = document.getElementById('customUrl').value,
+		domainRegex = document.getElementById('domain').value,
+		notificationValue = document.getElementById('notification').checked,
+		notificationTitle = document.getElementById('notificationTitle').value,
+		notificationText = document.getElementById('notificationText').value,
+		passedValidation = true;
+	//More than enough
+	if (customUrl.length > chrome.storage.sync.QUOTA_BYTES_PER_ITEM / 2) {
+		passedValidation = false;
+	}
+	if (notificationValue === true && (notificationText.length > 256 || notificationTitle.length > 256)) {
+		passedValidation = false;
+	}
+	if (domainRegex.length > chrome.storage.sync.QUOTA_BYTES_PER_ITEM / 2) {
+		passedValidation = false;
+	}
+	return passedValidation;
 }
-
+document.getElementById('iconFilePicker').addEventListener('change', handleFileSelect, false);
+var iconChange = false;
 // Saves options to chrome.storage
 function saveOptions() {
-    "use strict";
-
-    var customUrl = document.getElementById('customUrl').value,
-        mode = -1,
-        domainRegex = document.getElementById('domain').value,
-        iconB64 = document.getElementById('iconImage').src, //BASE64
-        notificationValue = document.getElementById('notification').checked,
-        notificationTitle = document.getElementById('notificationTitle').value,
-        notificationText = document.getElementById('notificationText').value;
-
-    var radios = document.getElementsByName('mode');
-
-    for (var i = 0, length = radios.length; i < length; i++) {
-        if (radios[i].checked) {
-            mode = i;
-            break;
-        }
-    }
-    
-    chrome.storage.sync.set({
-        'customUrl': customUrl,
-        'mode': mode,
-        'domain': domainRegex,
-        'icon': iconB64,
-        'notification': {
-            'show': notificationValue,
-            'title': notificationTitle,
-            'text': notificationText
-        }
-    }, function () {
-        // Update status to let user know options were saved.
-        var status = document.getElementById('status');
-        status.textContent = 'Options saved';
-        // Check for error
-        if (chrome.runtime.lastError !== undefined) {
-            console.error("An error ocurred saving options: " + chrome.runtime.lastError.string);
-            status.textContent = 'An error ocurred saving options';
-        }
-        setTimeout(function () {
-            status.textContent = '';
-        }, 1800);
-    });
+	"use strict";
+	var customUrl = document.getElementById('customUrl').value,
+		mode = -1,
+		domainRegex = document.getElementById('domain').value,
+		iconB64 = document.getElementById('iconImage').src, //BASE64
+		notificationValue = document.getElementById('notification').checked,
+		notificationTitle = document.getElementById('notificationTitle').value,
+		notificationText = document.getElementById('notificationText').value;
+	var radios = document.getElementsByName('mode');
+	for (var i = 0, length = radios.length; i < length; i++) {
+		if (radios[i].checked) {
+			mode = i;
+			break;
+		}
+	}
+	if (validateOptions() === true) {
+		//Split icon base64 string, maximum QUOTA_BYTES_PER_ITEM = 4096 bytes
+		//maxLength = QUOTA_BYTES_PER_ITEM - 4 (key 'icon') - 4 quotes (on key and value)
+		var maxLength = chrome.storage.sync.QUOTA_BYTES_PER_ITEM - 'iconxx'.length - 4,
+			//g = global match: finds all matches rather than stopping on the first one
+			regex = new RegExp('.{1,' + maxLength + '}', 'g'),
+			splitted = iconB64.match(regex),
+			iconKeys = [];
+		var options = {};
+		//Generate the keys for the icon
+		options['customUrl'] = customUrl;
+		options['mode'] = mode;
+		options['domain'] = domainRegex;
+		options['notification'] = {
+			'show': notificationValue,
+			'title': notificationTitle,
+			'text': notificationText
+		};
+		
+		for (var i = 0; i < ICON_MAX_KEYS; i++) {
+			if (splitted[i] !== undefined) {
+				options['icon' + i] = splitted[i];
+			} else {
+				//Clear the rest, in case the new icon is smaller
+				options['icon' + i] = '';
+			}
+		};
+		chrome.storage.sync.set(options, function() {
+			// Update status to let user know options were saved.
+			var status = document.getElementById('status');
+			status.textContent = 'Options saved';
+			// Check for error
+			if (chrome.runtime.lastError !== undefined) {
+				console.error("An error ocurred saving options: " + chrome.runtime.lastError.string);
+				console.error(chrome.runtime.lastError);
+				status.textContent = 'An error ocurred saving options';
+			}
+			setTimeout(function() {
+				status.textContent = '';
+			}, 1800);
+		});
+	};
 }
-
+//Restore user options on page load
 function restoreOptions() {
-    "use strict";
-    // Set defaults
-    chrome.storage.sync.get({
-        customUrl: '',
-        mode: 0,
-        domain: ".*", // Use default domain regex to match anything
-        //Base64(icons/default-32.png)
-        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAABVpJREFUWIW1l3FsnHUZxz/Pc9cr27q1mDmKyh/GRBnCcPfCGNP2FegAoeu12iJBthg2spGoCX8Q1BiNQaMBMjASHRUdEJeFDGN7HQyFzV07Shd2dzOwGhkEEhLKUIH1NqC9u+fxj7Z47+ytt4rPX/e77/f9Pp97f+/v93tPiNSPNAgPPwrWA/oEJ875ejbbW2SWSrZ0Xu34IwDEuDm/v3/vbL4wDM864Y27TPwaQXfmMv3fBHxG10pzEB5uBb4BmgC6WDx23WyhAK7+M1WaVWnG+Gk1X8HP7kCkXdE6gQ1B2PnFSj0CUC77W5V0jrxZLRizxopRU1VQt4oMMy3zVlWAwwfSoyL0gD1myPrc/vTBqgA1Vn4oPWj4LWCPuUv38wf6XqrUZb7BK1vWvayqnwEw5+/5wf7z55MTrxx84UvdH4/FSm1gzYb+Q0z25ob+ODZfSIBLWlLnldXbBJY6OpaIlZ8+uG/gWAQgDMN4gcafCBO3Tz2AguIYXkq2dPx6fNHkHS8/9dTEmTQOgvaFLIzd72obFVUAwSmVmQxaU79okHe/n8lkSgrICRp3CHKnGQXc73WXzeb8HPiXqHy78WR9X09PT6zW5mEYxq0hthvlVkzHzP0ujE0495hRQLij4E07AeJB2Hkj+A3AaKKOKw/uS394e1av7r6nmJj4M6rXvnKsuBHorQWgQNO3FK4Af476+q/kn9l1fEa7NLxuq8E+Ee1OtqZuUnfbDODit1TODcDIyONvG7H10/qWWu+AO1vAzFXXZyuaAzyfefJNMd0EIGJb1EWSZhyrtuTyg31/A44qdnEt07Bi7dpFKnwO9MXcX/pemc1zaKh/2Ix/YppUjDqF0hy/aBJUjxxhToCGkwsUwObIZEqPq4odQfnkytbO5bO5LmlJnSdiyx17aXR01+RcAMPD6YJhr4NddNmV686ZNTPsulCVZuAFRXgYQKX8YBC0L6w0XnBBT8Khl6ll9PBczWdK0e2K1hVL+mAYhpG9JgjaF5bdtgG4sD3ewPi2cW+6UUVbbBG5IOy430SOivNp54PvgF5kkF/C+H21AhQT790d+2DBV1UlNU7TwWSY+qXAa+DnO367wmfN/MASPd4rAKtWXbukdFbidyLytVPDHN+TmEjcPDLy+Nsz361e3f2xYn3xBeATAIa9buiKv2b6353xrLi8a1k8bjtEaZuFcVd90TcOD6cLkbMgaEltRtlW0f3O7GD/3RFPa8cGE3lAYXEk0uw4Grstm+nbGfGHHT8Aues/kdyay/Q/NDOOnIYokX3AJXp0JltTNyHyiBoJ3O81oc2ENnfuQ1kAviMIO3oiGf91pEfHcWqsNWs6Fk8IDxhWBLk6P5gerJD3JlvW7Xb4E8ivgqD9iWx293u15Orclql6v05TwNni+tv8UKQ5ALmhgX2iPKrKUhr0+lpzawZQbDmAiM/67geAM63J5z9yAHPKAO6SqGoSpjWfaxc8c4AYHJr+2HUaWxeA4YdO45kfgJ9s3uPwqgjdyTC16VQ9GXbeJtABHF3C+DO15ta8CrLZ3mIQdm4w86dV+c3KMHWD4num6Lge/CrD3hfYkMlkPvopAMhm+g6I2hXAqMJakK0gWxG5ysxfjLmHuczAyJlk1nwHZmq6wYXBl9etcdOLAdQ5nB9KP0fFf4r/G8B0eXb/wLPAs/O8/n8GYFXY9akS9mN3M/H4D+f7+j5vgLKXHhLRa0QUF1sGpOaTE3kI3T3yAili75zm2qUf+oxl1UzCqZnlSGYEIDe4MoP77zEm3P0PFM59smqwyHcNGwPeQPleNd/xBZNphzTGBMb27P6B4Ur93zwtNAQpY/WdAAAAAElFTkSuQmCC',
-        notification: {
-            'show': false,
-            'title': 'Custom Button',
-            'text': 'URL doesn\'t match'
-        }
-    }, function (items) {
-        // Check for error
-        if (chrome.runtime.lastError !== undefined) {
-            console.error("An error ocurred restoring options: " + chrome.runtime.lastError);
-            return;
-        }
-
-        document.getElementById('customUrl').value = items.customUrl;
-        document.getElementById('domain').value = items.domain;
-        document.getElementsByName('mode')[items.mode].checked = true;
-        document.getElementById('iconImage').src = items.icon;
-        document.getElementById('notification').checked = items.notification.show;
-        document.getElementById('notificationTitle').value = items.notification.title;
-        document.getElementById('notificationText').value = items.notification.text;
-
-        if (items.notification.show === true) {
-            document.getElementById('notificationOptions').style.display = 'block';
-        }
-    });
+	"use strict";
+	// Set defaults
+	var options = {};
+	//Generate the keys for the icon
+	options['customUrl'] = '';
+	options['mode'] = 0;
+	options['domain'] = ".*";
+	options['notification'] = {
+		'show': false,
+		'title': 'Curtom Button',
+		'text': 'URL doesn\'t match'
+	};
+	for (var i = 0; i < ICON_MAX_KEYS; i++) {
+		//Clear the rest, in case the new icon is smaller
+		options['icon' + i] = '';
+	};
+	options['icon0'] = defaultIcon;
+	chrome.storage.sync.get(options, function(items) {
+		// Check for error
+		if (chrome.runtime.lastError !== undefined) {
+			console.error("An error ocurred restoring options: " + chrome.runtime.lastError);
+			return;
+		}
+		document.getElementById('customUrl').value = items.customUrl;
+		document.getElementById('domain').value = items.domain;
+		document.getElementsByName('mode')[items.mode].checked = true;
+		//Get icon parts and join them
+		var iconString = '';
+		for (var i = 0; i < ICON_MAX_KEYS; i++) {
+			iconString += items['icon' + i];
+		};
+		document.getElementById('iconImage').src = iconString;
+		document.getElementById('notification').checked = items.notification.show;
+		document.getElementById('notificationTitle').value = items.notification.title;
+		document.getElementById('notificationText').value = items.notification.text;
+		if (items.notification.show === true) {
+			document.getElementById('notificationOptions').style.display = 'block';
+		}
+	});
 }
-
-function restoreDomain() {
-    "use strict";
-    document.getElementById('domain').value = ".*";
+//Reset to default domain, match anything
+function resetDomain() {
+	"use strict";
+	document.getElementById('domain').value = ".*";
 }
-
-function restoreIcon() {
-    "use strict";
-    document.getElementById('iconImage').src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAABVpJREFUWIW1l3FsnHUZxz/Pc9cr27q1mDmKyh/GRBnCcPfCGNP2FegAoeu12iJBthg2spGoCX8Q1BiNQaMBMjASHRUdEJeFDGN7HQyFzV07Shd2dzOwGhkEEhLKUIH1NqC9u+fxj7Z47+ytt4rPX/e77/f9Pp97f+/v93tPiNSPNAgPPwrWA/oEJ875ejbbW2SWSrZ0Xu34IwDEuDm/v3/vbL4wDM864Y27TPwaQXfmMv3fBHxG10pzEB5uBb4BmgC6WDx23WyhAK7+M1WaVWnG+Gk1X8HP7kCkXdE6gQ1B2PnFSj0CUC77W5V0jrxZLRizxopRU1VQt4oMMy3zVlWAwwfSoyL0gD1myPrc/vTBqgA1Vn4oPWj4LWCPuUv38wf6XqrUZb7BK1vWvayqnwEw5+/5wf7z55MTrxx84UvdH4/FSm1gzYb+Q0z25ob+ODZfSIBLWlLnldXbBJY6OpaIlZ8+uG/gWAQgDMN4gcafCBO3Tz2AguIYXkq2dPx6fNHkHS8/9dTEmTQOgvaFLIzd72obFVUAwSmVmQxaU79okHe/n8lkSgrICRp3CHKnGQXc73WXzeb8HPiXqHy78WR9X09PT6zW5mEYxq0hthvlVkzHzP0ujE0495hRQLij4E07AeJB2Hkj+A3AaKKOKw/uS394e1av7r6nmJj4M6rXvnKsuBHorQWgQNO3FK4Af476+q/kn9l1fEa7NLxuq8E+Ee1OtqZuUnfbDODit1TODcDIyONvG7H10/qWWu+AO1vAzFXXZyuaAzyfefJNMd0EIGJb1EWSZhyrtuTyg31/A44qdnEt07Bi7dpFKnwO9MXcX/pemc1zaKh/2Ix/YppUjDqF0hy/aBJUjxxhToCGkwsUwObIZEqPq4odQfnkytbO5bO5LmlJnSdiyx17aXR01+RcAMPD6YJhr4NddNmV686ZNTPsulCVZuAFRXgYQKX8YBC0L6w0XnBBT8Khl6ll9PBczWdK0e2K1hVL+mAYhpG9JgjaF5bdtgG4sD3ewPi2cW+6UUVbbBG5IOy430SOivNp54PvgF5kkF/C+H21AhQT790d+2DBV1UlNU7TwWSY+qXAa+DnO367wmfN/MASPd4rAKtWXbukdFbidyLytVPDHN+TmEjcPDLy+Nsz361e3f2xYn3xBeATAIa9buiKv2b6353xrLi8a1k8bjtEaZuFcVd90TcOD6cLkbMgaEltRtlW0f3O7GD/3RFPa8cGE3lAYXEk0uw4Grstm+nbGfGHHT8Aues/kdyay/Q/NDOOnIYokX3AJXp0JltTNyHyiBoJ3O81oc2ENnfuQ1kAviMIO3oiGf91pEfHcWqsNWs6Fk8IDxhWBLk6P5gerJD3JlvW7Xb4E8ivgqD9iWx293u15Orclql6v05TwNni+tv8UKQ5ALmhgX2iPKrKUhr0+lpzawZQbDmAiM/67geAM63J5z9yAHPKAO6SqGoSpjWfaxc8c4AYHJr+2HUaWxeA4YdO45kfgJ9s3uPwqgjdyTC16VQ9GXbeJtABHF3C+DO15ta8CrLZ3mIQdm4w86dV+c3KMHWD4num6Lge/CrD3hfYkMlkPvopAMhm+g6I2hXAqMJakK0gWxG5ysxfjLmHuczAyJlk1nwHZmq6wYXBl9etcdOLAdQ5nB9KP0fFf4r/G8B0eXb/wLPAs/O8/n8GYFXY9akS9mN3M/H4D+f7+j5vgLKXHhLRa0QUF1sGpOaTE3kI3T3yAili75zm2qUf+oxl1UzCqZnlSGYEIDe4MoP77zEm3P0PFM59smqwyHcNGwPeQPleNd/xBZNphzTGBMb27P6B4Ur93zwtNAQpY/WdAAAAAElFTkSuQmCC';
+//Reset to default icon
+function resetIcon() {
+	"use strict";
+	document.getElementById('iconImage').src = defaultIcon;
 }
-
-function restoreNotification() {
-    "use strict";
-    document.getElementById('notificationTitle').value = 'Custom Button';
-    document.getElementById('notificationText').value = 'URL doesn\'t match';
+//Reset notification options values
+function resetNotification() {
+	"use strict";
+	document.getElementById('notificationTitle').value = 'Custom Button';
+	document.getElementById('notificationText').value = 'URL doesn\'t match';
 }
-
+//Show/hide notification options
 function toggleNotificationOptions() {
-    "use strict";
-    var options = document.getElementById('notificationOptions');
-    // First time we get display is empty
-    if (options.style.display === '' || options.style.display === 'none') {
-        options.style.display = 'block';
-    } else {
-        options.style.display = 'none';
-    }
+	"use strict";
+	var options = document.getElementById('notificationOptions');
+	// First time we get display is empty
+	if (options.style.display === '' || options.style.display === 'none') {
+		options.style.display = 'block';
+	} else {
+		options.style.display = 'none';
+	}
 }
-
+//Listener ftw
 document.addEventListener('DOMContentLoaded', restoreOptions);
 document.getElementById('save').addEventListener('click', saveOptions);
 document.getElementById('notification').addEventListener('change', toggleNotificationOptions);
-document.getElementById('domainRestore').addEventListener('click', restoreDomain);
-document.getElementById('notificationRestore').addEventListener('click', restoreNotification);
-document.getElementById('iconRestore').addEventListener('click', restoreIcon);
+document.getElementById('domainRestore').addEventListener('click', resetDomain);
+document.getElementById('notificationRestore').addEventListener('click', resetNotification);
+document.getElementById('iconRestore').addEventListener('click', resetIcon);
+if (window.File && window.FileReader && window.FileList && window.Blob) {
+	document.getElementById('iconFilePicker').addEventListener('change', handleFileSelect, false);
+} else {
+	console.log('The File APIs are not fully supported in this browser.');
+}

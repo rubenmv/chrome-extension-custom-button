@@ -6,7 +6,7 @@
     vertical-align: top;
 }
 body {
-    background: #ddd url(bg.png) repeat;
+    background: #ddd url(images/bg.png) repeat;
 }
 #wrapper {
     margin: 30px 0 0 155px;
@@ -61,7 +61,7 @@ p {
     vertical-align: middle;
     margin: 0 1em;
     padding: 1em;
-    border: 3px solid #ccc;
+    border: 3px dotted #ccc;
 }
 .controls {
     display: inline-block;
