@@ -29,3 +29,8 @@ For example, this will match any *http/https* site: **^(http|https)://***
 
 <h3>NOTIFICATIONS</h3>
 Shows desktop notification when domain doesn't match. When active it's possible to change the title and text for the notification.
+
+<h2>LEGAL STUFF</h2>
+**Custom Icon** by <a href="https://twitter.com/rub3nmv">**Rub&eacute;n Mart&iacute;nez**</a> is licensed as <a href="http://www.gnu.org/licenses/gpl-3.0.txt">GPLv3</a>.<br>
+Default icon made by <a href="http://www.typicons.com" title="Stephen Hutchings">Stephen Hutchings</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed under <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>
+
