@@ -1,3 +1,4 @@
 - Reorganizar como se crean las opciones por defecto, mirar otras extensiones
 - Agregar sincronización para las opciones
 - Limitar el tamaño y dimensiones del icono y validar al guardar
+- Limitar los input de titulo y texto de las notificaciones a lo que vea decente.
