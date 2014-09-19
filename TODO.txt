@@ -1,8 +1,3 @@
-- Cambiar el icono por defecto por otro más decente https://www.iconfinder.com/popcic
 - Reorganizar como se crean las opciones por defecto, mirar otras extensiones
 - Agregar sincronización para las opciones
-- Escoger otro nombre más decente
-- Agregar ejemplos de uso en la ayuda
-- Agregar informacion legal en la página de opciones y enlace a github
-- Control de errores en el input del icono
-- Limitar también los cuadros de domain, url, etc. para cumplir los 4096 maximos
+- Limitar el tamaño y dimensiones del icono y validar al guardar
