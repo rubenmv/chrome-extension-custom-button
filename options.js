@@ -145,7 +145,7 @@ function restoreOptions() {
 		 ************* */
 	var options = {};
 	//Generate the keys for the icon
-	options.customUrl = '';
+	options.customUrl = 'https://encrypted.google.com/';
 	options.mode = 0;
 	options.domain = ".*";
 	options.notification = {
@@ -192,7 +192,7 @@ function resetDomain() {
 //Reset to default icon
 function resetIcon() {
 	"use strict";
-	document.getElementById('iconImage').src = defaultIcon;
+	document.getElementById('iconImage').src = DEFAULT_ICON;
 }
 //Reset notification options values
 function resetNotification() {

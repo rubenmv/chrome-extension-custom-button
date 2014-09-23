@@ -42,7 +42,7 @@ function initOptions() {
 	// Set defaults
 	var options = {};
 	//Generate the keys for the icon
-	options.customUrl = '';
+	options.customUrl = 'https://encrypted.google.com/';
 	options.mode = 0;
 	options.domain = ".*";
 	options.notification = {
