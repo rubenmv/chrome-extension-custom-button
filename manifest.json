@@ -2,6 +2,7 @@
     "manifest_version": 2,
 
     "name": "Custom Button",
+	"short_name": "Custom Button",
     "description": "Customize a button.",
     "version": "0.1",
 

@@ -109,7 +109,6 @@ function saveOptions() {
 	for (i = 0; i < ICON_MAX_KEYS; i++) {
 		options['icon' + i] = '';
 	}
-	console.log(ICON_MAX_KEYS);
 	//Split icon base64 string, maximum QUOTA_BYTES_PER_ITEM = 4096 bytes
 	//maxLength = QUOTA_BYTES_PER_ITEM - 4 (key 'icon') - 4 quotes (on key and value)
 	var maxLength = ITEM_BYTES_LIMIT - 'iconxx'.length - 4,
@@ -117,7 +116,7 @@ function saveOptions() {
 		regex = new RegExp('.{1,' + maxLength + '}', 'g'),
 		splitted = iconSource.match(regex),
 		iconKeys = [];
-	console.log(splitted);
+
 	for (i = 0; i < ICON_MAX_KEYS && i < splitted.length; i++) {
 		if (splitted[i] !== undefined) {
 			options['icon' + i] = splitted[i];
