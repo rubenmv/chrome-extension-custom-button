@@ -3,7 +3,7 @@
 <b>Custom Button</b> is a simple Chrome extension where you can customize a button, set an URL, change the icon and some other stuff.
 
 Just go to options and set the url and the window mode on activation.
-You can also set a regular expresion to match a certain domain and activate notifications when the match fails.
+You can also set a regular expression to match a certain domain and activate notifications when the match fails.
 
 <h2>Options</h2>
 <h3>URL</h3>
@@ -24,7 +24,7 @@ For example, you could set the url to *chrome://extensions* and then set it to o
 
 <h3>ICON</h3>
 Sets the icon on the button and notifications.<br>
-*PNG format and 64x64px maximum is recommended.*<br>
+JPG/PNG/ICO format and 19x19px is recommended or it will be resized (but try other dimensions anyway, it may look fine).<br>
 *Maximum size of 100KB.*
 
 <h3>DOMAIN</h3>
