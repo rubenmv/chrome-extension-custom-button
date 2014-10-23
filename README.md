@@ -8,12 +8,19 @@ You can also set a regular expresion to match a certain domain and activate noti
 <h2>Options</h2>
 <h3>URL</h3>
 Set the url you want to launch. For example:<br>
-*https://www.youtube.com/feed/subscriptions*
+*http://digg.com/reader*
 
 Add **%url** anywhere in the string and it will be replaced by the active tab url. For example:<br>
-*http://en.savefrom.net/%url*
+*http://www.sciweavers.org/iWeb2Shot?url=%url*
 
-Choose the **opening method**. For example, you could set the url to *chrome://extensions* and then set it to open on a popup window. This way your button will open the extensions page on a separate popup window, pretty cool!
+Choose the opening mode:
+- **Current tab**: opens in the active tab.
+- **New tab**: creates a new tab.
+- **New window**: creates a new Chrome window.
+- **Popup window**: create a new window but in a popup style, no toolbar, no tab bar, just window border and content.
+- **Popup on button**: tries to open the site in a popup. Due to browser security policies, some sites won't load in the button popup. For example Google sites and Facebook won't load.
+
+For example, you could set the url to *chrome://extensions* and then set it to open on a popup window. This way your button will open the extensions page on a separate popup window, pretty cool!
 
 <h3>ICON</h3>
 Sets the icon on the button and notifications.<br>

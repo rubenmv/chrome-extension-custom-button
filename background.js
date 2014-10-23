@@ -1,18 +1,30 @@
 /*global chrome, console, document*/
-
-var ICON_MAX_KEYS = 14;
-var customUrlGlobal,
+// Modes "enum"
+var ModeEnum = {
+	TAB_CURRENT: 0,
+	TAB_NEW: 1,
+	WINDOW: 2,
+	POPUP_WINDOW: 3,
+	POPUP_BUTTON: 4
+};
+// background.js globals
+var domainRegExp,
+	customUrlGlobal,
 	domainGlobal,
 	modeGlobal,
 	notificationGlobal = {
+		'id': 'supermegacoolid',
 		'show': '',
 		'title': '',
 		'text': '',
 		'icon': ''
 	};
-
+/**
+ * Initialize variables from storage settings
+ */
 function initOptions() {
-	"use strict";
+	'use strict';
+	var cadena = '';
 	//sync.get callback, data received
 	function dataRetrieved(items) {
 		// Check for error
@@ -23,6 +35,7 @@ function initOptions() {
 		// Initialize
 		customUrlGlobal = items.customUrl;
 		domainGlobal = items.domain;
+		domainRegExp = new RegExp(domainGlobal);
 		modeGlobal = items.mode;
 		notificationGlobal.show = items.notification.show;
 		notificationGlobal.title = items.notification.title;
@@ -36,14 +49,21 @@ function initOptions() {
 		chrome.browserAction.setIcon({
 			path: iconString
 		});
+		if (modeGlobal === ModeEnum.POPUP_BUTTON) {
+			chrome.browserAction.setPopup({
+				popup: 'popup.html'
+			});
+		} else {
+			chrome.browserAction.setPopup({
+				popup: ''
+			});
+		}
 	}
-
-
 	// Set defaults
 	var options = {};
 	//Generate the keys for the icon
-	options.customUrl = 'https://encrypted.google.com/';
-	options.mode = 0;
+	options.customUrl = DEFAULT_URL;
+	options.mode = ModeEnum.TAB_CURRENT;
 	options.domain = ".*";
 	options.notification = {
 		'show': false,
@@ -54,45 +74,32 @@ function initOptions() {
 		//Clear the rest, in case the new icon is smaller
 		options['icon' + i] = '';
 	}
-	options.icon0 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAk6QAAJOkBUCTn+AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKhSURBVHic7ZqxaxRBFMZ/3yFYJNcFEfughYKKFjaKhUj+AxsVjGKXRlJb2kmwUZM0apO0NmKpSIooRrEwVnYhsZSkSJF7FrnFi9nbzOzu3VvMfPBg2bmd973fDTO7zMjMOMxqeRvwVgLgbcBbCYC3AW8lAN4GvFUJgKQJSTOSPkjalGQDiGVJtySprqL3yMyiAxgDFgEbYjwFVMZvYS0lih8HNoZcfBbP6oYQW3wLWHIqfiAQYgFMOxefxfO6ICjmY0jSKnAyp+kbMA/8Cu6sWFPApQN+Mwfct6pfcxH/fhvYYf+/8ar2iQkWevr/npMzi1kqjoSYZfAc+cvmk3jsUboKrPZpuwfMVlkiYwCcyLtpZh/LJg+Rma1TDOEuMFcWQlPfBLeyC0kjARAmKQmhqQC+9lyfh6CRMAnMx0JoKoCVnuuHWVEBEO4Aj6IyRczMN8iZieteAezvC9f7njwvgXZP+3H6rw6/gdFBrAJDk5l1gNvAZvfWTWBN0jtJC8AMsN7n8TZwLTTXkSpGBykz+ynpCvACOA2MApcDHz8amqeRIyCTmX0GLgAPgNfAWuijoTkaOwIymdk28Lgb+yQpr9jglaDRI2AYSgC8DXgrAfA24K0EwNuAtxIAbwPeSgC8DXgrAfA24K0EwNuAtxIAbwPeSgC8DXgrAfA24K0EwNuAt2IA5G5KSLpYk5doFeQO3UCJArACdHLuT0X0UbfycnfYu7tcqKYekjpIx9g9GXImp+2HmZ0K7ily27opx+SKYjqqphL79t4HJYtiCWgNDEAXgudR2aLYAMaj6yl5gsPjsHRRLAJjZWqJmgT/laQJ4Dq7e/hngZHSncVpC/gCfALemtmbsh1VAvA/KL0JehvwVgLgbcBbCYC3AW8degB/AF61RcU6E47HAAAAAElFTkSuQmCCa108ecd08c36a0062fb1687f7122400d';
+	options.icon0 = 'images/default-64.png';
 	// Get the items from storage (asynchronous)
 	chrome.storage.sync.get(options, dataRetrieved);
 }
-// "OnLoad" listener to set the default options
-document.addEventListener('DOMContentLoaded', initOptions);
-chrome.browserAction.onClicked.addListener(function (tabId) {
-	"use strict";
-	var tabUrl = tabId.url,
-		domainRegExp = new RegExp(domainGlobal);
-	// Check if the active tab url matches the allowed domains for the button to activate
-	if (tabUrl !== undefined && domainRegExp.test(tabUrl)) {
-		// Replace %url with tab url
-		var newUrl = customUrlGlobal.replace('%url', tabUrl);
-		switch (modeGlobal) {
-		case 0: //current tab
-			chrome.tabs.update({
-				'url': newUrl
-			});
-			break;
-		case 1: //new tab
-			chrome.tabs.create({
-				'url': newUrl
-			});
-			break;
-		case 2: //new window
-			chrome.windows.create({
-				'url': newUrl,
-				'type': 'normal' //normal
-			});
-			break;
-		case 3: //popup
-			chrome.windows.create({
-				'url': newUrl,
-				'type': 'popup' //popup
-			});
-			break;
-		}
-	} else if (notificationGlobal.show === true) {
+// 
+/**
+ * Replaces %url with the current tabUrl
+ * @param  {string} url
+ * @return {string}		[URL replaced with active tab URL]
+ */
+function readyUrl(url) {
+	return customUrlGlobal.replace('%url', url);
+}
+/**
+ * Check if domain is valid
+ * @param  {string} url
+ * @return {boolean}
+ */
+function checkDomain(url) {
+	return domainRegExp.test(url);
+}
+/**
+ * Show notification if active
+ */
+function showNotification() {
+	if (notificationGlobal.show === true) {
 		var options = {
 			type: "basic",
 			title: notificationGlobal.title,
@@ -100,12 +107,58 @@ chrome.browserAction.onClicked.addListener(function (tabId) {
 			iconUrl: notificationGlobal.icon
 		};
 		// No video alert
-		chrome.notifications.create("", options, function () {});
+		chrome.notifications.clear(notificationGlobal.id, function() {
+			chrome.notifications.create(notificationGlobal.id, options, function() {});
+		});
+	}
+}
+/**
+ * On button clicked, check, replace and go to url
+ * @param  {int} tabId ID from the active tab
+ */
+chrome.browserAction.onClicked.addListener(function(tabId) {
+	'use strict';
+	var tabUrl = tabId.url;
+	// Check if the active tab url matches the allowed domains for the button to activate
+	if (tabUrl !== undefined && checkDomain(tabUrl)) {
+		// Replace %url with tab url
+		var newUrl = readyUrl(tabUrl);
+		switch (modeGlobal) {
+			case ModeEnum.TAB_CURRENT: //current tab
+				chrome.tabs.update({
+					url: newUrl
+				});
+				break;
+			case ModeEnum.TAB_CURRENT: //new tab
+				chrome.tabs.create({
+					url: newUrl
+				});
+				break;
+			case ModeEnum.WINDOW: //new window
+				chrome.windows.create({
+					url: newUrl,
+					type: 'normal' //normal
+				});
+				break;
+			case ModeEnum.POPUP_WINDOW: //popup as new window
+				chrome.windows.create({
+					'url': newUrl,
+					'type': 'popup' //popup
+				});
+				break;
+				// case ModeEnum.POPUP_BUTTON: // Nothing to do here
+		}
+	} else {
+		showNotification();
 	}
 });
-// Settings changes
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-	"use strict";
+/**
+ * On settings/storage change, update variables
+ * @param  {Object} changes   Contains properties changed
+ * @param  {string} namespace No use
+ */
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+	'use strict';
 	var key, storageChange, newValue, fullIcon = '';
 	for (key in changes) {
 		if (changes.hasOwnProperty(key)) {
@@ -114,6 +167,15 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 			if (key === 'customUrl') {
 				customUrlGlobal = newValue;
 			} else if (key === 'mode') {
+				if (newValue !== ModeEnum.POPUP_BUTTON) {
+					chrome.browserAction.setPopup({
+						popup: ''
+					}); // Disable popup
+				} else {
+					chrome.browserAction.setPopup({
+						popup: 'popup.html'
+					});
+				}
 				modeGlobal = newValue;
 			} else if (key === 'notification') {
 				notificationGlobal.show = newValue.show;
@@ -121,6 +183,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 				notificationGlobal.text = newValue.text;
 			} else if (key === 'domain') {
 				domainGlobal = storageChange.newValue;
+				domainRegExp = new RegExp(domainGlobal);
 			} else if (key.match(/^icon[0-9]{1,2}$/) !== null) { //if is icon key, add
 				fullIcon += newValue;
 			}
@@ -133,3 +196,5 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 		});
 	}
 });
+// "OnLoad" listener to set the default options
+document.addEventListener('DOMContentLoaded', initOptions);

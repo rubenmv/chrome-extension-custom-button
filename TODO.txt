@@ -1,1 +1,0 @@
-- Cuando se lanzan notificaciones, cerrar la actual para mostrar la nueva. La extension de Downloads notifier o como se llame lo hace.

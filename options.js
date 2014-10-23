@@ -1,29 +1,23 @@
 /*global chrome, FileReader, window, document, console*/
-var FILE_TYPES = ['image/jpeg', 'image/png'],
-	FILE_SIZE_LIMIT = 102400, //Bytes, 100KB (1KB = 1024B)
-	IMAGE_DIM_LIMIT = 128, //px, square
-	// Icon is saved in base64, calculate storage limits and leave some bytes for the other items
-	// QUOTA_BYTES = max bytes in sync storage
-	// QUOTA_BYTES_PER_ITEM = max bytes per item(key:value + quotes)
-	// QUOTA_BYTES / QUOTA_BYTES_PER_ITEM = max items to split the icon string
-	// icon items = max keys - some keys for the rest
-	ITEM_BYTES_LIMIT = chrome.storage.sync.QUOTA_BYTES_PER_ITEM, //for later use
-	// We leave at least 3 free slots for the rest of items (3*QUOTA_BYTES_PER_ITEM is more than enough free bytes), no need to worry about items (slots) limit (is like 512)
-	ICON_MAX_KEYS = (chrome.storage.sync.QUOTA_BYTES / ITEM_BYTES_LIMIT) - 3,
-	DEFAULT_ICON = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAk6QAAJOkBUCTn+AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKhSURBVHic7ZqxaxRBFMZ/3yFYJNcFEfughYKKFjaKhUj+AxsVjGKXRlJb2kmwUZM0apO0NmKpSIooRrEwVnYhsZSkSJF7FrnFi9nbzOzu3VvMfPBg2bmd973fDTO7zMjMOMxqeRvwVgLgbcBbCYC3AW8lAN4GvFUJgKQJSTOSPkjalGQDiGVJtySprqL3yMyiAxgDFgEbYjwFVMZvYS0lih8HNoZcfBbP6oYQW3wLWHIqfiAQYgFMOxefxfO6ICjmY0jSKnAyp+kbMA/8Cu6sWFPApQN+Mwfct6pfcxH/fhvYYf+/8ar2iQkWevr/npMzi1kqjoSYZfAc+cvmk3jsUboKrPZpuwfMVlkiYwCcyLtpZh/LJg+Rma1TDOEuMFcWQlPfBLeyC0kjARAmKQmhqQC+9lyfh6CRMAnMx0JoKoCVnuuHWVEBEO4Aj6IyRczMN8iZieteAezvC9f7njwvgXZP+3H6rw6/gdFBrAJDk5l1gNvAZvfWTWBN0jtJC8AMsN7n8TZwLTTXkSpGBykz+ynpCvACOA2MApcDHz8amqeRIyCTmX0GLgAPgNfAWuijoTkaOwIymdk28Lgb+yQpr9jglaDRI2AYSgC8DXgrAfA24K0EwNuAtxIAbwPeSgC8DXgrAfA24K0EwNuAtxIAbwPeSgC8DXgrAfA24K0EwNuAt2IA5G5KSLpYk5doFeQO3UCJArACdHLuT0X0UbfycnfYu7tcqKYekjpIx9g9GXImp+2HmZ0K7ily27opx+SKYjqqphL79t4HJYtiCWgNDEAXgudR2aLYAMaj6yl5gsPjsHRRLAJjZWqJmgT/laQJ4Dq7e/hngZHSncVpC/gCfALemtmbsh1VAvA/KL0JehvwVgLgbcBbCYC3AW8degB/AF61RcU6E47HAAAAAElFTkSuQmCCa108ecd08c36a0062fb1687f7122400d';
-
-var setFileError = function(errorString) {
+/**
+ * Displays error on file field
+ * @param {string} errorString
+ */
+function setFileError(errorString) {
 	// Update status to let user know options were saved.
 	var status = document.getElementById('statusIcon');
 	status.textContent = errorString;
 	window.setTimeout(function() {
 		status.textContent = '';
 	}, 5000);
-};
-//Read icon file
-//Limits: 100KB and/or 128x128px
-var handleFileSelect = function(evt) {
-	"use strict";
+}
+/**
+ * Read icon file and convert to base64.
+ * Limits: 100KB and/or 128x128px
+ * @param  {Object} evt Event containing the file
+ */
+function handleFileSelect(evt) {
+	'use strict';
 	var files = evt.target.files,
 		file = files[0];
 	if (files && file) {
@@ -33,8 +27,7 @@ var handleFileSelect = function(evt) {
 			setFileError('File size limit exceeded (max 100KB)');
 			evt.srcElement.value = '';
 			return;
-		}
-		else if (FILE_TYPES.indexOf(file.type) === -1 ) {
+		} else if (FILE_TYPES.indexOf(file.type) === -1) {
 			setFileError('Invalid file type (JPEG or PNG)');
 			evt.srcElement.value = '';
 			return;
@@ -47,8 +40,11 @@ var handleFileSelect = function(evt) {
 		};
 		reader.readAsBinaryString(file);
 	}
-};
-//Options validation
+}
+/**
+ * Validate options
+ * @return {boolean} Returns true if success, false if fails
+ */
 function validateOptions() {
 	var customUrl = document.getElementById('customUrl').value,
 		domainRegex = document.getElementById('domain').value,
@@ -68,17 +64,18 @@ function validateOptions() {
 	}
 	return passedValidation;
 }
-document.getElementById('iconFilePicker').addEventListener('change', handleFileSelect, false);
-var iconChange = false;
-// Saves options to chrome.storage
+// Saves options to chrome.storage.sync
+/**
+ * Saves options to chrome.storage.sync
+ */
 function saveOptions() {
-	"use strict";
+	'use strict';
 	var i = 0;
 	// Get values from inputs
 	var customUrl = document.getElementById('customUrl').value,
 		mode = -1,
 		domainRegex = document.getElementById('domain').value,
-		iconSource = document.getElementById('iconImage').src, //BASE64 or url
+		iconSource = document.getElementById('iconImage').src,
 		notificationValue = document.getElementById('notification').checked,
 		notificationTitle = document.getElementById('notificationTitle').value,
 		notificationText = document.getElementById('notificationText').value,
@@ -116,7 +113,6 @@ function saveOptions() {
 		regex = new RegExp('.{1,' + maxLength + '}', 'g'),
 		splitted = iconSource.match(regex),
 		iconKeys = [];
-
 	for (i = 0; i < ICON_MAX_KEYS && i < splitted.length; i++) {
 		if (splitted[i] !== undefined) {
 			options['icon' + i] = splitted[i];
@@ -137,15 +133,15 @@ function saveOptions() {
 		}, 1800);
 	});
 }
-//Restore user options on page load
+/**
+ * Restore user options on page load
+ */
 function restoreOptions() {
-	"use strict";
-	/*  *************
-	Set defaults for localStorage get error
-		 ************* */
+	'use strict';
+	// Set defaults for localStorage get error
 	var options = {};
 	//Generate the keys for the icon
-	options.customUrl = 'https://encrypted.google.com/';
+	options.customUrl = 'https://duckduckgo.com/';
 	options.mode = 0;
 	options.domain = ".*";
 	options.notification = {
@@ -153,14 +149,12 @@ function restoreOptions() {
 		'title': 'Curtom Button',
 		'text': 'URL doesn\'t match'
 	};
-	//icon cleanup
+	// Icon cleanup
 	for (var i = 0; i < ICON_MAX_KEYS; i++) {
 		options['icon' + i] = '';
 	}
 	options.icon0 = DEFAULT_ICON;
-	/*  *************
-	Get the items from localStorage
-		 ************* */
+	// Get the items from localStorage
 	chrome.storage.sync.get(options, function(items) {
 		// Check for error
 		if (chrome.runtime.lastError !== undefined) {
@@ -184,25 +178,33 @@ function restoreOptions() {
 		}
 	});
 }
-//Reset to default domain, match anything
+/**
+ * Reset to default domain, match anything
+ */
 function resetDomain() {
-	"use strict";
+	'use strict';
 	document.getElementById('domain').value = ".*";
 }
-//Reset to default icon
+/**
+ * Reset to default icon
+ */
 function resetIcon() {
-	"use strict";
+	'use strict';
 	document.getElementById('iconImage').src = DEFAULT_ICON;
 }
-//Reset notification options values
+/**
+ * Reset notification options values
+ */
 function resetNotification() {
-	"use strict";
+	'use strict';
 	document.getElementById('notificationTitle').value = 'Custom Button';
 	document.getElementById('notificationText').value = 'URL doesn\'t match';
 }
-//Show/hide notification options
+/**
+ * Show/hide notification options
+ */
 function toggleNotificationOptions() {
-	"use strict";
+	'use strict';
 	var options = document.getElementById('notificationOptions');
 	// First time we get display is empty
 	if (options.style.display === '' || options.style.display === 'none') {
@@ -211,9 +213,12 @@ function toggleNotificationOptions() {
 		options.style.display = 'none';
 	}
 }
-//Listener ftw
+/**
+ * Listeners
+ */
 document.addEventListener('DOMContentLoaded', restoreOptions);
 document.getElementById('save').addEventListener('click', saveOptions);
+document.getElementById('iconFilePicker').addEventListener('change', handleFileSelect, false);
 document.getElementById('notification').addEventListener('change', toggleNotificationOptions);
 document.getElementById('domainRestore').addEventListener('click', resetDomain);
 document.getElementById('notificationRestore').addEventListener('click', resetNotification);

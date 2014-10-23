@@ -63,7 +63,7 @@ footer {
     display: inline-block;
     margin-left: 2em;
 }
-img#iconImage {
+#iconImage {
     background: #eee url(images/checkerboard.png) repeat;
     margin: 0 1em;
     padding: 1em;
@@ -71,7 +71,7 @@ img#iconImage {
     max-width: 64px;
     max-height: 64px;
 }
-label.label2 {
+.label2 {
     font-weight: normal;
 }
 .section {
@@ -98,6 +98,9 @@ label.label2 {
 }
 .warning {
     color: #FF8000;
+}
+.warning a {
+    color: inherit;
 }
 .alert {
     color: #cc0101;
