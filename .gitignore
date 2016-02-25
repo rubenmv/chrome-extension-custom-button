@@ -14,6 +14,13 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
+# Sublime Text project files
+*.sublime-project
+*.sublime-workspace
+
+# Node
+node_modules
+
 # =========================
 # Operating System Files
 # =========================
@@ -26,7 +33,8 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
+Icon
+
 
 # Thumbnails
 ._*

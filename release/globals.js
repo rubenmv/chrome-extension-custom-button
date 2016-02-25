@@ -1,0 +1,1 @@
+var DEFAULT_ICON="images/default-64.png",DEFAULT_URL="https://duckduckgo.com/",FILE_TYPES=["image/jpeg","image/png","image/x-icon"],FILE_SIZE_LIMIT=102400,IMAGE_DIM_LIMIT=128,ITEM_BYTES_LIMIT=chrome.storage.sync.QUOTA_BYTES_PER_ITEM,ICON_MAX_KEYS=chrome.storage.sync.QUOTA_BYTES/ITEM_BYTES_LIMIT-3;

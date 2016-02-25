@@ -129,7 +129,7 @@ chrome.browserAction.onClicked.addListener(function(tabId) {
 					url: newUrl
 				});
 				break;
-			case ModeEnum.TAB_CURRENT: //new tab
+			case ModeEnum.TAB_NEW: //new tab
 				chrome.tabs.create({
 					url: newUrl
 				});
