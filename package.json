@@ -2,7 +2,7 @@
   "name": "chrome-extension-custom-button",
   "version": "1.0.1",
   "devDependencies": {
-    "gulp": "^3.9.0",
+    "gulp": "^4.0.0",
     "gulp-copy": "0.0.2",
     "gulp-minify-css": "^1.2.4",
     "gulp-minify-html": "^1.0.6",

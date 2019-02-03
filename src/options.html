@@ -70,10 +70,20 @@
 				</div>
 			</div>
 			<h2>Advanced</h2>
+			<!--Url processing, get only domain-->
+			<div class="section">
+				<div class="controls">
+					<label for="onlyHostname">Replace %url with only hostname</label>
+					<input type="checkbox" id="onlyHostname" />
+				</div>
+				<div class="help">
+					<span>When replacing %url, it will only use the protocol and hostname.<br>For example, https://www.google.com/search?q=hello will become https://www.google.com/</span>
+				</div>
+			</div>
 			<!--Domain pattern-->
 			<div class="section">
 				<div class="controls">
-					<label for="domain">Domain</label>
+					<label for="domain">Filter by domain</label>
 					<input type="text" id="domain" maxlength="1024" />
 				</div>
 				<div class="help">

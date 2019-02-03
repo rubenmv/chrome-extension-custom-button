@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	chrome.tabs.query(query, function(tabs) {
 		var tabUrl = tabs[0].url;
 		if (tabUrl !== undefined && bgPage.checkDomain(tabUrl)) {
-			var newUrl = bgPage.readyUrl(tabUrl); // 0 is active tab
+			var newUrl = bgPage.prepareUrl(tabUrl); // 0 is active tab
 			document.getElementById('frameContent').src = newUrl;
 		} else {
 			bgPage.showNotification();

@@ -75,6 +75,7 @@ function saveOptions() {
 	var customUrl = document.getElementById('customUrl').value,
 		mode = -1,
 		domainRegex = document.getElementById('domain').value,
+		onlyHostname = document.getElementById('onlyHostname').checked,
 		iconSource = document.getElementById('iconImage').src,
 		notificationValue = document.getElementById('notification').checked,
 		notificationTitle = document.getElementById('notificationTitle').value,
@@ -97,6 +98,7 @@ function saveOptions() {
 	options.customUrl = customUrl;
 	options.mode = mode;
 	options.domain = domainRegex;
+	options.onlyHostname = onlyHostname;
 	options.notification = {
 		'show': notificationValue,
 		'title': notificationTitle,
@@ -144,6 +146,7 @@ function restoreOptions() {
 	options.customUrl = 'https://duckduckgo.com/';
 	options.mode = 0;
 	options.domain = ".*";
+	options.onlyHostname = false;
 	options.notification = {
 		'show': false,
 		'title': 'Curtom Button',
@@ -163,6 +166,7 @@ function restoreOptions() {
 		}
 		document.getElementById('customUrl').value = items.customUrl;
 		document.getElementById('domain').value = items.domain;
+		document.getElementById('onlyHostname').checked = items.onlyHostname;
 		document.getElementsByName('mode')[items.mode].checked = true;
 		var iconString = '';
 		//Get icon parts and join them

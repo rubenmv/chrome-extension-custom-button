@@ -9,6 +9,7 @@ var ModeEnum = {
 };
 // background.js globals
 var domainRegExp,
+	onlyHostnameGlobal,
 	customUrlGlobal,
 	domainGlobal,
 	modeGlobal,
@@ -36,6 +37,7 @@ function initOptions() {
 		customUrlGlobal = items.customUrl;
 		domainGlobal = items.domain;
 		domainRegExp = new RegExp(domainGlobal);
+		onlyHostnameGlobal = items.onlyHostname;
 		modeGlobal = items.mode;
 		notificationGlobal.show = items.notification.show;
 		notificationGlobal.title = items.notification.title;
@@ -65,6 +67,7 @@ function initOptions() {
 	options.customUrl = DEFAULT_URL;
 	options.mode = ModeEnum.TAB_CURRENT;
 	options.domain = ".*";
+	options.onlyHostname = false;
 	options.notification = {
 		'show': false,
 		'title': 'Curtom Button',
@@ -84,8 +87,14 @@ function initOptions() {
  * @param  {string} url
  * @return {string}		[URL replaced with active tab URL]
  */
-function readyUrl(url) {
-	return customUrlGlobal.replace('%url', url);
+function prepareUrl(url) {
+	var finalUrl = "";
+	if(onlyHostnameGlobal === true) {
+		var newUrl = new URL(url);
+		url = newUrl.protocol + "//" + newUrl.hostname;
+	}
+	finalUrl = customUrlGlobal.replace('%url', url);
+	return finalUrl;
 }
 /**
  * Check if domain is valid
@@ -122,7 +131,7 @@ chrome.browserAction.onClicked.addListener(function(tabId) {
 	// Check if the active tab url matches the allowed domains for the button to activate
 	if (tabUrl !== undefined && checkDomain(tabUrl)) {
 		// Replace %url with tab url
-		var newUrl = readyUrl(tabUrl);
+		var newUrl = prepareUrl(tabUrl);
 		switch (modeGlobal) {
 			case ModeEnum.TAB_CURRENT: //current tab
 				chrome.tabs.update({
@@ -184,6 +193,8 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 			} else if (key === 'domain') {
 				domainGlobal = storageChange.newValue;
 				domainRegExp = new RegExp(domainGlobal);
+			} else if (key === 'onlyHostname') {
+				onlyHostnameGlobal = storageChange.newValue;
 			} else if (key.match(/^icon[0-9]{1,2}$/) !== null) { //if is icon key, add
 				fullIcon += newValue;
 			}

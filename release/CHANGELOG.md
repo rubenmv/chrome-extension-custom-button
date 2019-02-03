@@ -1,5 +1,8 @@
 # Change log
 
+## [1.1.0] 2019-02-04
+- NEW: New advanced setting, replaces %url with only protocol + hostname.
+
 ## [1.0.1] 2016-02-26
 - BUGFIX: "New tab" mode was not working, fixed.
 
