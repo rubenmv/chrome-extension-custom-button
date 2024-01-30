@@ -1,4 +1,11 @@
 /*global chrome, FileReader, window, document, console*/
+
+var DEFAULT_ICON = "images/default-64.png",
+	FILE_TYPES = ["image/jpeg", "image/png", "image/x-icon"],
+	FILE_SIZE_LIMIT = 102400,
+	ITEM_BYTES_LIMIT = chrome.storage.sync.QUOTA_BYTES_PER_ITEM,
+	ICON_MAX_KEYS = chrome.storage.sync.QUOTA_BYTES / ITEM_BYTES_LIMIT - 3;
+
 /**
  * Displays error on file field
  * @param {string} errorString

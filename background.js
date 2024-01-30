@@ -1,4 +1,8 @@
 /*global chrome, console, document*/
+
+var DEFAULT_URL = "https://duckduckgo.com/",
+ICON_MAX_KEYS = chrome.storage.sync.QUOTA_BYTES / ITEM_BYTES_LIMIT - 3;
+
 // Modes "enum"
 var ModeEnum = {
 	TAB_CURRENT: 0,

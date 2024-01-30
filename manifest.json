@@ -1,13 +1,12 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
 
     "name": "Custom Button",
 	"short_name": "Custom Button",
     "description": "Customize a button.",
-    "version": "1.1.0",
+    "version": "1.2.0",
 
     "permissions": ["notifications", "storage", "tabs"],
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "browser_action": {
         "default_icon": {
@@ -21,7 +20,9 @@
         "24": "images/default-24.png"
     },
     "background": {
-        "scripts": ["globals.js", "background.js"]
+        "service_worker": "background.js"
     },
-    "options_page": "options.html"
+    "options_ui": {
+        "page": "options.html"
+    }
 }
