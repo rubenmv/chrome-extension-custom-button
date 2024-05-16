@@ -1,6 +1,7 @@
 /*global chrome, console, document*/
 
 var DEFAULT_URL = "https://duckduckgo.com/",
+ITEM_BYTES_LIMIT = chrome.storage.sync.QUOTA_BYTES_PER_ITEM,
 ICON_MAX_KEYS = chrome.storage.sync.QUOTA_BYTES / ITEM_BYTES_LIMIT - 3;
 
 // Modes "enum"
@@ -52,15 +53,15 @@ function initOptions() {
 			iconString += items['icon' + i];
 		}
 		notificationGlobal.icon = iconString;
-		chrome.browserAction.setIcon({
+		chrome.action.setIcon({
 			path: iconString
 		});
 		if (modeGlobal === ModeEnum.POPUP_BUTTON) {
-			chrome.browserAction.setPopup({
+			chrome.action.setPopup({
 				popup: 'popup.html'
 			});
 		} else {
-			chrome.browserAction.setPopup({
+			chrome.action.setPopup({
 				popup: ''
 			});
 		}
@@ -129,11 +130,11 @@ function showNotification() {
  * On button clicked, check, replace and go to url
  * @param  {int} tabId ID from the active tab
  */
-chrome.browserAction.onClicked.addListener(function(tabId) {
+chrome.action.onClicked.addListener(tabId => {
 	'use strict';
 	var tabUrl = tabId.url;
 	// Check if the active tab url matches the allowed domains for the button to activate
-	if (tabUrl !== undefined && checkDomain(tabUrl)) {
+	if (tabUrl && checkDomain(tabUrl)) {
 		// Replace %url with tab url
 		var newUrl = prepareUrl(tabUrl);
 		switch (modeGlobal) {
@@ -181,11 +182,11 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 				customUrlGlobal = newValue;
 			} else if (key === 'mode') {
 				if (newValue !== ModeEnum.POPUP_BUTTON) {
-					chrome.browserAction.setPopup({
+					chrome.action.setPopup({
 						popup: ''
 					}); // Disable popup
 				} else {
-					chrome.browserAction.setPopup({
+					chrome.action.setPopup({
 						popup: 'popup.html'
 					});
 				}
@@ -206,10 +207,10 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 	}
 	if (fullIcon !== '') {
 		notificationGlobal.icon = fullIcon;
-		chrome.browserAction.setIcon({
+		chrome.action.setIcon({
 			path: fullIcon
 		});
 	}
 });
 // "OnLoad" listener to set the default options
-document.addEventListener('DOMContentLoaded', initOptions);
+initOptions();
