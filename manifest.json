@@ -4,9 +4,9 @@
     "name": "Custom Button",
 	"short_name": "Custom Button",
     "description": "Customize a button.",
-    "version": "1.2.0",
+    "version": "1.2.1",
 
-    "permissions": ["notifications", "storage", "tabs"],
+    "permissions": ["offscreen", "notifications", "storage", "tabs"],
     
     "icons": {
         "128": "images/default-128.png",

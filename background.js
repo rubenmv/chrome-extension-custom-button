@@ -1,8 +1,16 @@
 /*global chrome, console, document*/
 
 var DEFAULT_URL = "https://duckduckgo.com/",
-ITEM_BYTES_LIMIT = chrome.storage.sync.QUOTA_BYTES_PER_ITEM,
-ICON_MAX_KEYS = chrome.storage.sync.QUOTA_BYTES / ITEM_BYTES_LIMIT - 3;
+	ITEM_BYTES_LIMIT = chrome.storage.sync.QUOTA_BYTES_PER_ITEM,
+	ICON_MAX_KEYS = chrome.storage.sync.QUOTA_BYTES / ITEM_BYTES_LIMIT - 3,
+	DEBUG_MODE = false;
+
+
+function log(message) {
+	if (message && DEBUG_MODE === true) {
+		console.log(message);
+	}
+}
 
 // Modes "enum"
 var ModeEnum = {
@@ -13,7 +21,8 @@ var ModeEnum = {
 	POPUP_BUTTON: 4
 };
 // background.js globals
-var domainRegExp,
+var initialized,
+	domainRegExp,
 	onlyHostnameGlobal,
 	customUrlGlobal,
 	domainGlobal,
@@ -25,17 +34,27 @@ var domainRegExp,
 		'text': '',
 		'icon': ''
 	};
+
+	
+// workaround to avoid worker from being inactive on browser start
+chrome.runtime.onStartup.addListener( () => {
+	console.log(`onStartup()`);
+});
+
 /**
  * Initialize variables from storage settings
  */
 function initOptions() {
 	'use strict';
+	
+	log("initOptions");
+	
 	var cadena = '';
 	//sync.get callback, data received
 	function dataRetrieved(items) {
 		// Check for error
 		if (chrome.runtime.lastError !== undefined) {
-			console.log("An error ocurred initializing options: " + chrome.runtime.lastError.string);
+			log("An error ocurred initializing options: " + chrome.runtime.lastError.string);
 			return;
 		}
 		// Initialize
@@ -65,6 +84,8 @@ function initOptions() {
 				popup: ''
 			});
 		}
+		initialized = true;
+		log("initOptions finished");
 	}
 	// Set defaults
 	var options = {};
@@ -75,7 +96,7 @@ function initOptions() {
 	options.onlyHostname = false;
 	options.notification = {
 		'show': false,
-		'title': 'Curtom Button',
+		'title': 'Custom Button',
 		'text': 'URL doesn\'t match'
 	};
 	for (var i = 0; i < ICON_MAX_KEYS; i++) {
@@ -94,7 +115,7 @@ function initOptions() {
  */
 function prepareUrl(url) {
 	var finalUrl = "";
-	if(onlyHostnameGlobal === true) {
+	if (onlyHostnameGlobal === true) {
 		var newUrl = new URL(url);
 		url = newUrl.protocol + "//" + newUrl.hostname;
 	}
@@ -107,6 +128,8 @@ function prepareUrl(url) {
  * @return {boolean}
  */
 function checkDomain(url) {
+	log("checkDomain: " + url);
+	if(!url) return false;
 	return domainRegExp.test(url);
 }
 /**
@@ -121,8 +144,8 @@ function showNotification() {
 			iconUrl: notificationGlobal.icon
 		};
 		// No video alert
-		chrome.notifications.clear(notificationGlobal.id, function() {
-			chrome.notifications.create(notificationGlobal.id, options, function() {});
+		chrome.notifications.clear(notificationGlobal.id, function () {
+			chrome.notifications.create(notificationGlobal.id, options, function () { });
 		});
 	}
 }
@@ -132,7 +155,14 @@ function showNotification() {
  */
 chrome.action.onClicked.addListener(tabId => {
 	'use strict';
+	
+	if(!initialized){
+		initOptions();
+	}
+	
 	var tabUrl = tabId.url;
+	log("tabId: " + tabId + ", tabId.url: " + tabUrl);
+	if(!tabUrl) return;
 	// Check if the active tab url matches the allowed domains for the button to activate
 	if (tabUrl && checkDomain(tabUrl)) {
 		// Replace %url with tab url
@@ -160,7 +190,7 @@ chrome.action.onClicked.addListener(tabId => {
 					'type': 'popup' //popup
 				});
 				break;
-				// case ModeEnum.POPUP_BUTTON: // Nothing to do here
+			// case ModeEnum.POPUP_BUTTON: // Nothing to do here
 		}
 	} else {
 		showNotification();
@@ -171,7 +201,7 @@ chrome.action.onClicked.addListener(tabId => {
  * @param  {Object} changes   Contains properties changed
  * @param  {string} namespace No use
  */
-chrome.storage.onChanged.addListener(function(changes, namespace) {
+chrome.storage.onChanged.addListener(function (changes, namespace) {
 	'use strict';
 	var key, storageChange, newValue, fullIcon = '';
 	for (key in changes) {
@@ -212,5 +242,18 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 		});
 	}
 });
-// "OnLoad" listener to set the default options
+
 initOptions();
+
+
+// Offscreen keepalive
+async function createOffscreen() {
+await chrome.offscreen.createDocument({
+	url: 'offscreen.html',
+	reasons: ['BLOBS'],
+	justification: 'keep service worker running',
+}).catch(() => {});
+}
+chrome.runtime.onStartup.addListener(createOffscreen);
+self.onmessage = e => {}; // keepAlive
+createOffscreen();
